@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>IELTS Collocation Trainer</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #111111;
+      --muted: #666666;
+      --line: #dddddd;
+      --soft: #f6f6f6;
+      --soft2: #fafafa;
+      --shadow: 0 8px 24px rgba(0,0,0,0.06);
+      --radius: 16px;
+      --font: 15px;
+      --maxw: 980px;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: var(--font);
+      line-height: 1.6;
+    }
+    body {
+      padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom);
+    }
+    .app {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 10px 0 28px;
+    }
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .panel {
+      background: var(--soft2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    label.small {
+      font-size: 13px;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 6px;
+    }
+    select, textarea, button, input {
+      font: inherit;
+    }
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--text);
+    }
+    .btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    button {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      min-height: 46px;
+      flex: 1 1 140px;
+    }
+    button.primary {
+      background: var(--text);
+      color: white;
+      border-color: var(--text);
+    }
+    button:active {
+      transform: translateY(1px);
+    }
+    .status {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 12px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 12px;
+      background: white;
+      font-size: 13px;
+    }
+    .card {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .topic-tag, .index-tag {
+      font-size: 13px;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 999px;
+      padding: 6px 10px;
+    }
+    .collocation {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .meaning {
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .prompt-list {
+      display: grid;
+      gap: 10px;
+    }
+    .prompt {
+      padding: 12px;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+    .prompt strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 200px;
+      resize: vertical;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--text);
+      line-height: 1.7;
+    }
+    .footer-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(14px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      background: #111;
+      color: white;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 999;
+    }
+    .toast.show { opacity: 1; }
+
+    @media (min-width: 860px) {
+      .controls {
+        grid-template-columns: 280px 1fr;
+      }
+    }
+
+    /* Landscape phone / rotated view */
+    @media (orientation: landscape) and (max-height: 560px) {
+      .card.landscape {
+        grid-template-columns: 0.95fr 1.05fr;
+        align-items: start;
+      }
+      textarea {
+        min-height: 270px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div>
+        <div class="title">IELTS Collocation Trainer</div>
+        <div class="subtitle">Responsive cho điện thoại, xoay dọc/ngang đều dùng được • tự lưu tiến độ</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="panel">
+        <label class="small" for="topicSelect">Chủ đề</label>
+        <select id="topicSelect"></select>
+      </div>
+      <div class="panel btns">
+        <button id="startBtn" class="primary">Bắt đầu</button>
+        <button id="prevBtn">Câu trước</button>
+        <button id="nextBtn">Câu sau</button>
+        <button id="clearBtn">Xóa câu hiện tại</button>
+        <button id="copyBtn">Copy 10 câu</button>
+      </div>
+    </div>
+
+    <div class="status">
+      <div class="badge" id="progressBadge">Mục 1 / 1</div>
+      <div class="badge" id="windowBadge">Lô copy: 1–10</div>
+      <div class="badge" id="savedBadge">Đã lưu tự động</div>
+    </div>
+
+    <div class="panel card landscape" id="mainCard">
+      <div>
+        <div class="meta">
+          <div class="topic-tag" id="topicTag">Education</div>
+          <div class="index-tag" id="indexTag">#1</div>
+        </div>
+        <div class="collocation" id="collocationText">quality of education</div>
+        <div class="meaning" id="meaningText">chất lượng giáo dục</div>
+
+        <div class="prompt-list" style="margin-top: 12px;">
+          <div class="prompt">
+            <strong>Mở đầu</strong>
+            <div id="introText"></div>
+          </div>
+          <div class="prompt">
+            <strong>Phát triển ý</strong>
+            <div id="developText"></div>
+          </div>
+          <div class="prompt">
+            <strong>Kết ý</strong>
+            <div id="wrapText"></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label class="small" for="answerBox">Viết đoạn tiếng Anh của m ở đây</label>
+        <textarea id="answerBox" placeholder="Viết thành 1 đoạn ngắn bằng tiếng Anh, dùng collocation mục tiêu và phát triển ý theo cách của m..."></textarea>
+        <div class="footer-note">Mỗi collocation có 1 ô viết chung để m luyện như viết thật. Dữ liệu sẽ được lưu ngay trên máy.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const TOPICS = {
+      "Education": [
+        ["quality of education", "chất lượng giáo dục"], ["access to education", "khả năng tiếp cận giáo dục"], ["formal education", "giáo dục chính quy"], ["higher education", "giáo dục đại học"], ["primary education", "giáo dục tiểu học"], ["secondary education", "giáo dục trung học"], ["vocational training", "đào tạo nghề"], ["academic performance", "thành tích học tập"], ["educational background", "nền tảng học vấn"], ["learning environment", "môi trường học tập"], ["school curriculum", "chương trình học ở trường"], ["practical skills", "kỹ năng thực tiễn"], ["theoretical knowledge", "kiến thức lý thuyết"], ["critical thinking", "tư duy phản biện"], ["problem-solving skills", "kỹ năng giải quyết vấn đề"], ["academic pressure", "áp lực học tập"], ["heavy workload", "khối lượng công việc nặng"], ["exam-oriented system", "hệ thống thiên về thi cử"], ["lifelong learning", "học tập suốt đời"], ["distance learning", "học từ xa"], ["online learning platform", "nền tảng học trực tuyến"], ["face-to-face instruction", "giảng dạy trực tiếp"], ["teaching methods", "phương pháp giảng dạy"], ["educational inequality", "bất bình đẳng giáo dục"], ["equal opportunities", "cơ hội bình đẳng"], ["compulsory education", "giáo dục bắt buộc"], ["academic qualifications", "bằng cấp học thuật"], ["learning outcomes", "kết quả học tập"], ["school facilities", "cơ sở vật chất trường học"], ["well-rounded education", "nền giáo dục toàn diện"], ["moral education", "giáo dục đạo đức"], ["school discipline", "kỷ luật học đường"], ["student motivation", "động lực học tập của học sinh"], ["talented students", "học sinh có năng khiếu"], ["disadvantaged students", "học sinh có hoàn cảnh khó khăn"], ["academic achievement", "thành tựu học tập"], ["language proficiency", "năng lực ngôn ngữ"], ["literacy rate", "tỷ lệ biết chữ"], ["educational reform", "cải cách giáo dục"], ["tuition fees", "học phí"], ["financial burden", "gánh nặng tài chính"], ["scholarship opportunities", "cơ hội học bổng"], ["classroom interaction", "sự tương tác trong lớp học"], ["intellectual development", "phát triển trí tuệ"], ["educational standards", "tiêu chuẩn giáo dục"], ["student-centered learning", "học tập lấy người học làm trung tâm"], ["teacher training", "đào tạo giáo viên"], ["academic success", "thành công học thuật"], ["social skills", "kỹ năng xã hội"], ["future career prospects", "triển vọng nghề nghiệp tương lai"]
+      ],
+      "Environment": [
+        ["environmental protection", "bảo vệ môi trường"], ["climate change", "biến đổi khí hậu"], ["global warming", "nóng lên toàn cầu"], ["carbon emissions", "khí thải carbon"], ["greenhouse gases", "khí nhà kính"], ["air pollution", "ô nhiễm không khí"], ["water pollution", "ô nhiễm nguồn nước"], ["noise pollution", "ô nhiễm tiếng ồn"], ["environmental degradation", "suy thoái môi trường"], ["natural resources", "tài nguyên thiên nhiên"], ["renewable energy", "năng lượng tái tạo"], ["fossil fuels", "nhiên liệu hóa thạch"], ["energy consumption", "mức tiêu thụ năng lượng"], ["energy efficiency", "hiệu quả năng lượng"], ["waste management", "quản lý rác thải"], ["recycling facilities", "cơ sở tái chế"], ["plastic waste", "rác thải nhựa"], ["single-use products", "sản phẩm dùng một lần"], ["sustainable development", "phát triển bền vững"], ["sustainable lifestyle", "lối sống bền vững"], ["eco-friendly products", "sản phẩm thân thiện với môi trường"], ["environmentally friendly", "thân thiện với môi trường"], ["conservation efforts", "nỗ lực bảo tồn"], ["loss of biodiversity", "sự mất đa dạng sinh học"], ["endangered species", "loài có nguy cơ tuyệt chủng"], ["deforestation rates", "tỷ lệ phá rừng"], ["habitat destruction", "phá hủy môi trường sống"], ["rising sea levels", "mực nước biển dâng"], ["extreme weather events", "hiện tượng thời tiết cực đoan"], ["public awareness", "nhận thức của công chúng"], ["environmental policies", "chính sách môi trường"], ["stricter regulations", "quy định nghiêm ngặt hơn"], ["government intervention", "sự can thiệp của chính phủ"], ["carbon footprint", "dấu chân carbon"], ["public transport system", "hệ thống giao thông công cộng"], ["traffic congestion", "ùn tắc giao thông"], ["overconsumption of resources", "tiêu thụ quá mức tài nguyên"], ["irresponsible disposal", "việc vứt bỏ thiếu trách nhiệm"], ["eco-conscious consumers", "người tiêu dùng có ý thức môi trường"], ["green technologies", "công nghệ xanh"], ["long-term consequences", "hậu quả dài hạn"], ["environmental responsibility", "trách nhiệm môi trường"], ["urban expansion", "mở rộng đô thị"], ["land degradation", "thoái hóa đất"], ["water shortages", "tình trạng thiếu nước"], ["conservation programs", "chương trình bảo tồn"], ["clean energy sources", "nguồn năng lượng sạch"], ["environmental campaigns", "chiến dịch môi trường"], ["natural habitat", "môi trường sống tự nhiên"], ["sustainable consumption", "tiêu dùng bền vững"]
+      ],
+      "Technology": [
+        ["technological advancement", "tiến bộ công nghệ"], ["rapid technological development", "sự phát triển công nghệ nhanh chóng"], ["digital transformation", "chuyển đổi số"], ["advanced technology", "công nghệ tiên tiến"], ["cutting-edge technology", "công nghệ hiện đại bậc nhất"], ["artificial intelligence", "trí tuệ nhân tạo"], ["machine learning", "học máy"], ["digital devices", "thiết bị kỹ thuật số"], ["online platforms", "nền tảng trực tuyến"], ["social media networks", "mạng xã hội"], ["internet access", "quyền truy cập internet"], ["digital literacy", "hiểu biết công nghệ số"], ["information overload", "quá tải thông tin"], ["online communication", "giao tiếp trực tuyến"], ["virtual interaction", "tương tác ảo"], ["remote working", "làm việc từ xa"], ["online education", "giáo dục trực tuyến"], ["data security", "bảo mật dữ liệu"], ["privacy concerns", "mối lo ngại về quyền riêng tư"], ["cybercrime prevention", "phòng chống tội phạm mạng"], ["personal information", "thông tin cá nhân"], ["screen time", "thời gian sử dụng màn hình"], ["addictive nature", "tính gây nghiện"], ["technological dependence", "sự phụ thuộc vào công nghệ"], ["digital addiction", "nghiện kỹ thuật số"], ["labour-saving devices", "thiết bị tiết kiệm sức lao động"], ["automated systems", "hệ thống tự động"], ["workplace automation", "tự động hóa nơi làm việc"], ["job displacement", "sự thay thế việc làm"], ["human interaction", "tương tác giữa con người"], ["access to information", "khả năng tiếp cận thông tin"], ["technological innovation", "đổi mới công nghệ"], ["scientific research", "nghiên cứu khoa học"], ["modern conveniences", "tiện ích hiện đại"], ["electronic payment systems", "hệ thống thanh toán điện tử"], ["cashless society", "xã hội không tiền mặt"], ["digital economy", "nền kinh tế số"], ["online shopping habits", "thói quen mua sắm trực tuyến"], ["e-commerce platforms", "nền tảng thương mại điện tử"], ["communication barriers", "rào cản giao tiếp"], ["time-saving tools", "công cụ tiết kiệm thời gian"], ["improved efficiency", "hiệu quả được cải thiện"], ["technical skills", "kỹ năng kỹ thuật"], ["internet dependency", "sự lệ thuộc vào internet"], ["digital divide", "khoảng cách số"], ["immediate access", "khả năng truy cập tức thì"], ["online entertainment", "giải trí trực tuyến"], ["virtual reality", "thực tế ảo"], ["technological solutions", "giải pháp công nghệ"], ["long-term impact", "tác động dài hạn"]
+      ],
+      "Health": [
+        ["public health", "sức khỏe cộng đồng"], ["healthcare system", "hệ thống y tế"], ["medical treatment", "điều trị y tế"], ["healthcare services", "dịch vụ chăm sóc sức khỏe"], ["access to healthcare", "khả năng tiếp cận dịch vụ y tế"], ["mental health", "sức khỏe tinh thần"], ["physical health", "sức khỏe thể chất"], ["balanced diet", "chế độ ăn cân bằng"], ["healthy lifestyle", "lối sống lành mạnh"], ["unhealthy eating habits", "thói quen ăn uống không lành mạnh"], ["regular exercise", "tập thể dục thường xuyên"], ["sedentary lifestyle", "lối sống ít vận động"], ["chronic diseases", "bệnh mãn tính"], ["obesity rates", "tỷ lệ béo phì"], ["life expectancy", "tuổi thọ trung bình"], ["preventative measures", "biện pháp phòng ngừa"], ["preventive healthcare", "chăm sóc y tế dự phòng"], ["medical professionals", "chuyên gia y tế"], ["healthcare expenditure", "chi tiêu cho y tế"], ["medical facilities", "cơ sở y tế"], ["nutritious food", "thực phẩm giàu dinh dưỡng"], ["food safety", "an toàn thực phẩm"], ["fast food consumption", "việc tiêu thụ đồ ăn nhanh"], ["health-related problems", "các vấn đề liên quan đến sức khỏe"], ["stress management", "quản lý căng thẳng"], ["psychological well-being", "trạng thái tinh thần tốt"], ["emotional support", "hỗ trợ cảm xúc"], ["sleeping patterns", "thói quen ngủ nghỉ"], ["unhealthy behaviour", "hành vi không lành mạnh"], ["physical inactivity", "tình trạng ít vận động"], ["disease prevention", "phòng ngừa bệnh tật"], ["public awareness campaigns", "chiến dịch nâng cao nhận thức cộng đồng"], ["early diagnosis", "chẩn đoán sớm"], ["medical insurance", "bảo hiểm y tế"], ["treatment costs", "chi phí điều trị"], ["health education", "giáo dục sức khỏe"], ["quality of life", "chất lượng cuộc sống"], ["harmful substances", "chất có hại"], ["alcohol consumption", "việc tiêu thụ rượu bia"], ["smoking habits", "thói quen hút thuốc"], ["health consequences", "hậu quả đối với sức khỏe"], ["infectious diseases", "bệnh truyền nhiễm"], ["healthcare professionals", "nhân viên y tế"], ["nutritious meals", "bữa ăn bổ dưỡng"], ["work-life balance", "cân bằng công việc và cuộc sống"], ["physically demanding jobs", "công việc đòi hỏi thể lực"], ["mental exhaustion", "kiệt sức tinh thần"], ["healthcare inequality", "bất bình đẳng trong y tế"], ["active lifestyle", "lối sống năng động"], ["overall well-being", "sức khỏe tổng thể"]
+      ],
+      "Government & Society": [
+        ["government policy", "chính sách của chính phủ"], ["public services", "dịch vụ công"], ["social welfare", "phúc lợi xã hội"], ["public spending", "chi tiêu công"], ["state intervention", "sự can thiệp của nhà nước"], ["law enforcement", "thực thi pháp luật"], ["legal system", "hệ thống pháp luật"], ["social inequality", "bất bình đẳng xã hội"], ["income inequality", "bất bình đẳng thu nhập"], ["social justice", "công bằng xã hội"], ["equal rights", "quyền bình đẳng"], ["civil rights", "quyền dân sự"], ["basic needs", "nhu cầu cơ bản"], ["living standards", "mức sống"], ["quality of life", "chất lượng cuộc sống"], ["poverty reduction", "giảm nghèo"], ["unemployment rate", "tỷ lệ thất nghiệp"], ["social stability", "ổn định xã hội"], ["public safety", "an toàn công cộng"], ["crime prevention", "phòng chống tội phạm"], ["social problems", "vấn đề xã hội"], ["urban poverty", "nghèo đói đô thị"], ["rural development", "phát triển nông thôn"], ["public awareness", "nhận thức công chúng"], ["civic responsibility", "trách nhiệm công dân"], ["social responsibility", "trách nhiệm xã hội"], ["government funding", "nguồn tài trợ của chính phủ"], ["tax revenue", "nguồn thu thuế"], ["welfare programs", "chương trình phúc lợi"], ["social support", "hỗ trợ xã hội"], ["economic disparity", "chênh lệch kinh tế"], ["disadvantaged groups", "nhóm yếu thế"], ["vulnerable populations", "nhóm dân số dễ bị tổn thương"], ["social integration", "hòa nhập xã hội"], ["public institutions", "cơ quan công"], ["community development", "phát triển cộng đồng"], ["local authorities", "chính quyền địa phương"], ["strict regulations", "quy định nghiêm ngặt"], ["policy implementation", "triển khai chính sách"], ["long-term planning", "kế hoạch dài hạn"], ["social cohesion", "sự gắn kết xã hội"], ["government accountability", "trách nhiệm giải trình của chính phủ"], ["public participation", "sự tham gia của người dân"], ["political stability", "ổn định chính trị"], ["social reforms", "cải cách xã hội"], ["equal opportunities", "cơ hội bình đẳng"], ["public interest", "lợi ích công cộng"], ["social values", "giá trị xã hội"], ["government support", "sự hỗ trợ của chính phủ"], ["community-based initiatives", "sáng kiến dựa vào cộng đồng"]
+      ],
+      "Work, Business & Economy": [
+        ["economic growth", "tăng trưởng kinh tế"], ["economic development", "phát triển kinh tế"], ["national economy", "nền kinh tế quốc gia"], ["global economy", "nền kinh tế toàn cầu"], ["labour market", "thị trường lao động"], ["job opportunities", "cơ hội việc làm"], ["career prospects", "triển vọng nghề nghiệp"], ["professional development", "phát triển nghề nghiệp"], ["job satisfaction", "sự hài lòng trong công việc"], ["work-life balance", "cân bằng công việc và cuộc sống"], ["working conditions", "điều kiện làm việc"], ["minimum wage", "mức lương tối thiểu"], ["employee benefits", "phúc lợi cho nhân viên"], ["staff retention", "giữ chân nhân viên"], ["skilled workers", "lao động có tay nghề"], ["labour shortage", "thiếu hụt lao động"], ["unemployment levels", "mức độ thất nghiệp"], ["workplace stress", "căng thẳng nơi làm việc"], ["career advancement", "thăng tiến nghề nghiệp"], ["financial security", "sự ổn định tài chính"], ["earning potential", "tiềm năng thu nhập"], ["business expansion", "mở rộng kinh doanh"], ["consumer demand", "nhu cầu của người tiêu dùng"], ["market competition", "cạnh tranh thị trường"], ["economic pressure", "áp lực kinh tế"], ["living expenses", "chi phí sinh hoạt"], ["household income", "thu nhập hộ gia đình"], ["financial burden", "gánh nặng tài chính"], ["standard of living", "mức sống"], ["multinational companies", "công ty đa quốc gia"], ["small businesses", "doanh nghiệp nhỏ"], ["local enterprises", "doanh nghiệp địa phương"], ["economic inequality", "bất bình đẳng kinh tế"], ["business strategies", "chiến lược kinh doanh"], ["workforce productivity", "năng suất lao động"], ["economic recession", "suy thoái kinh tế"], ["financial crisis", "khủng hoảng tài chính"], ["job security", "sự ổn định việc làm"], ["flexible working hours", "giờ làm linh hoạt"], ["part-time employment", "việc làm bán thời gian"], ["full-time employment", "việc làm toàn thời gian"], ["entrepreneurial spirit", "tinh thần khởi nghiệp"], ["start-up culture", "văn hóa khởi nghiệp"], ["business investment", "đầu tư kinh doanh"], ["customer satisfaction", "sự hài lòng của khách hàng"], ["economic policy", "chính sách kinh tế"], ["sustainable growth", "tăng trưởng bền vững"], ["professional skills", "kỹ năng nghề nghiệp"], ["workplace efficiency", "hiệu quả nơi làm việc"], ["financial independence", "độc lập tài chính"]
+      ]
+    };
+
+    const topicStyles = {
+      "Education": [
+        "{meaning} đóng vai trò then chốt trong việc định hình chất lượng học tập và sự phát triển lâu dài của xã hội.",
+        "{meaning} nên được xem là một ưu tiên quan trọng trong mọi cuộc thảo luận về giáo dục hiện đại.",
+        "Nhiều người cho rằng {meaning} là một yếu tố có ảnh hưởng trực tiếp đến tương lai của người học."
+      ],
+      "Environment": [
+        "{meaning} đang trở thành một vấn đề cần được quan tâm nghiêm túc trong bối cảnh hiện nay.",
+        "Nhiều ý kiến cho rằng {meaning} là một thách thức lớn đối với sự phát triển bền vững.",
+        "{meaning} có liên hệ chặt chẽ với chất lượng sống của con người trong dài hạn."
+      ],
+      "Technology": [
+        "{meaning} đang làm thay đổi đáng kể cách con người học tập, làm việc và giao tiếp.",
+        "Trong xã hội hiện đại, {meaning} được xem là một yếu tố ngày càng quan trọng.",
+        "Nhiều người tin rằng {meaning} có thể tạo ra cả cơ hội lẫn thách thức cho con người."
+      ],
+      "Health": [
+        "{meaning} là một yếu tố có ảnh hưởng trực tiếp đến chất lượng cuộc sống của con người.",
+        "Trong xã hội hiện đại, {meaning} cần được quan tâm nghiêm túc hơn.",
+        "Nhiều chuyên gia cho rằng {meaning} là nền tảng của một cuộc sống ổn định và lành mạnh hơn."
+      ],
+      "Government & Society": [
+        "{meaning} có thể tạo ra ảnh hưởng sâu rộng đối với sự ổn định và phát triển của xã hội.",
+        "Nhiều người cho rằng {meaning} là một yếu tố quan trọng trong việc duy trì công bằng xã hội.",
+        "Trong bối cảnh hiện nay, {meaning} nên được xem là một ưu tiên chính sách quan trọng."
+      ],
+      "Work, Business & Economy": [
+        "{meaning} là một yếu tố quan trọng đối với sự phát triển của nền kinh tế hiện đại.",
+        "Nhiều người cho rằng {meaning} có ảnh hưởng trực tiếp đến mức sống và cơ hội của người dân.",
+        "Trong bối cảnh cạnh tranh ngày càng lớn, {meaning} đang trở thành một vấn đề đáng được quan tâm hơn."
+      ]
+    };
+
+    const devStyles = {
+      "Education": [
+        "Nếu lĩnh vực này không được đầu tư đúng mức, người học có thể thiếu cả nền tảng học thuật lẫn những kỹ năng cần thiết cho tương lai.",
+        "Khi học sinh được tiếp cận điều kiện học tập tốt hơn, họ thường có nhiều cơ hội phát huy năng lực và cải thiện triển vọng nghề nghiệp của mình.",
+        "Điều này đặc biệt quan trọng vì giáo dục không chỉ truyền đạt kiến thức mà còn góp phần hình thành tư duy, kỷ luật và khả năng thích nghi."
+      ],
+      "Environment": [
+        "Nếu vấn đề này tiếp tục bị xem nhẹ, những hậu quả tích lũy có thể ảnh hưởng nghiêm trọng đến tài nguyên, hệ sinh thái và sức khỏe con người.",
+        "Điều đáng lo ngại là nhiều tác động tiêu cực không xuất hiện ngay lập tức mà thường trở nên rõ ràng hơn trong dài hạn.",
+        "Khi chính phủ và người dân không hành động kịp thời, áp lực lên môi trường tự nhiên sẽ ngày càng gia tăng."
+      ],
+      "Technology": [
+        "Mặc dù xu hướng này mang lại sự tiện lợi rõ rệt, nó cũng có thể tạo ra những thay đổi lớn trong hành vi, kỹ năng và cách con người tương tác với nhau.",
+        "Nếu được áp dụng hợp lý, nó có thể cải thiện hiệu quả trong nhiều lĩnh vực, nhưng nếu bị lạm dụng, hệ quả tiêu cực cũng không nhỏ.",
+        "Điểm quan trọng là con người cần vừa tận dụng lợi ích của công nghệ vừa kiểm soát những rủi ro phát sinh từ nó."
+      ],
+      "Health": [
+        "Khi con người bỏ qua yếu tố này, họ có thể phải đối mặt với nhiều vấn đề sức khỏe nghiêm trọng hơn về lâu dài.",
+        "Điều này đặc biệt quan trọng vì sức khỏe tốt không chỉ giúp giảm nguy cơ bệnh tật mà còn cải thiện khả năng học tập, làm việc và tận hưởng cuộc sống.",
+        "Nếu chính phủ và cá nhân đầu tư nhiều hơn vào lĩnh vực này, áp lực lên hệ thống y tế cũng có thể được giảm bớt đáng kể."
+      ],
+      "Government & Society": [
+        "Nếu lĩnh vực này không được xử lý hợp lý, khoảng cách cơ hội và cảm giác bất công trong xã hội có thể ngày càng rõ rệt hơn.",
+        "Điều này đặc biệt quan trọng vì các quyết định công thường ảnh hưởng trực tiếp đến đời sống của nhiều nhóm người khác nhau.",
+        "Khi chính phủ, tổ chức và người dân cùng tham gia một cách có trách nhiệm, tác động tích cực thường bền vững hơn."
+      ],
+      "Work, Business & Economy": [
+        "Khi lĩnh vực này được quản lý hiệu quả, nó có thể tạo thêm việc làm, nâng cao thu nhập và cải thiện sức cạnh tranh của nền kinh tế.",
+        "Điều đáng chú ý là những thay đổi trong lĩnh vực này thường ảnh hưởng trực tiếp đến cả doanh nghiệp lẫn người lao động.",
+        "Nếu không có chiến lược phù hợp, nhiều cá nhân và tổ chức có thể gặp khó khăn trong việc thích nghi với biến động kinh tế hiện đại."
+      ]
+    };
+
+    const wrapStyles = {
+      "Education": [
+        "Vì vậy, đây nên được xem là một ưu tiên dài hạn thay vì chỉ là mục tiêu ngắn hạn.",
+        "Do đó, việc cải thiện lĩnh vực này có thể mang lại lợi ích bền vững cho cả cá nhân lẫn xã hội.",
+        "Chính vì thế, đầu tư đúng hướng vào vấn đề này là điều cần thiết trong giáo dục hiện đại."
+      ],
+      "Environment": [
+        "Vì vậy, hành động sớm và nhất quán là điều cần thiết để giảm thiểu những rủi ro trong tương lai.",
+        "Do đó, vấn đề này cần được đặt ở vị trí trung tâm trong mọi chiến lược phát triển bền vững.",
+        "Chính vì thế, đây không còn là một lựa chọn mà đã trở thành một trách nhiệm cấp thiết."
+      ],
+      "Technology": [
+        "Vì vậy, con người cần tiếp cận vấn đề này theo hướng cân bằng hơn giữa lợi ích và rủi ro.",
+        "Do đó, việc sử dụng và quản lý lĩnh vực này một cách hợp lý là điều đặc biệt quan trọng.",
+        "Chính vì thế, đây nên được nhìn nhận như một công cụ mạnh, nhưng cần được kiểm soát khôn ngoan."
+      ],
+      "Health": [
+        "Vì vậy, quan tâm đúng mức đến lĩnh vực này có thể cải thiện đáng kể sức khỏe cộng đồng trong dài hạn.",
+        "Do đó, đây nên được xem là một phần thiết yếu của chiến lược chăm sóc sức khỏe hiện đại.",
+        "Chính vì thế, đầu tư vào vấn đề này là một lựa chọn cần thiết và hợp lý."
+      ],
+      "Government & Society": [
+        "Vì vậy, đây nên là một trọng tâm quan trọng trong mọi chính sách hướng tới sự phát triển công bằng hơn.",
+        "Do đó, giải quyết tốt vấn đề này có thể góp phần củng cố sự ổn định và gắn kết xã hội.",
+        "Chính vì thế, lĩnh vực này cần được tiếp cận bằng tầm nhìn dài hạn và trách nhiệm chung."
+      ],
+      "Work, Business & Economy": [
+        "Vì vậy, đây nên được coi là một yếu tố trọng tâm của chiến lược phát triển kinh tế dài hạn.",
+        "Do đó, cải thiện lĩnh vực này có thể mang lại lợi ích cho cả cá nhân, doanh nghiệp và toàn xã hội.",
+        "Chính vì thế, đầu tư đúng hướng vào vấn đề này là điều cần thiết trong nền kinh tế hiện đại."
+      ]
+    };
+
+    function buildItems() {
+      const items = [];
+      Object.entries(TOPICS).forEach(([topic, arr]) => {
+        arr.forEach(([collocation, meaning], idx) => {
+          const intro = topicStyles[topic][idx % topicStyles[topic].length].replaceAll('{meaning}', meaning);
+          const develop = devStyles[topic][idx % devStyles[topic].length];
+          const wrap = wrapStyles[topic][idx % wrapStyles[topic].length];
+          items.push({ topic, collocation, meaning, intro, develop, wrap });
+        });
+      });
+      return items;
+    }
+
+    const allItems = buildItems();
+    let filteredItems = [];
+    let currentIndex = 0;
+    const answers = JSON.parse(localStorage.getItem('ielts_trainer_answers_v1') || '{}');
+    const prefs = JSON.parse(localStorage.getItem('ielts_trainer_prefs_v1') || '{}');
+
+    const topicSelect = document.getElementById('topicSelect');
+    const startBtn = document.getElementById('startBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const collocationText = document.getElementById('collocationText');
+    const meaningText = document.getElementById('meaningText');
+    const introText = document.getElementById('introText');
+    const developText = document.getElementById('developText');
+    const wrapText = document.getElementById('wrapText');
+    const topicTag = document.getElementById('topicTag');
+    const indexTag = document.getElementById('indexTag');
+    const progressBadge = document.getElementById('progressBadge');
+    const windowBadge = document.getElementById('windowBadge');
+    const savedBadge = document.getElementById('savedBadge');
+    const answerBox = document.getElementById('answerBox');
+    const toast = document.getElementById('toast');
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    function makeKey(item) {
+      return `${item.topic}__${item.collocation}`;
+    }
+
+    function populateTopics() {
+      const opts = ['<option value="All topics">Tất cả chủ đề</option>']
+        .concat(Object.keys(TOPICS).map(t => `<option value="${t}">${t}</option>`));
+      topicSelect.innerHTML = opts.join('');
+      topicSelect.value = prefs.topic || 'All topics';
+    }
+
+    function applyFilter() {
+      const selected = topicSelect.value;
+      filteredItems = selected === 'All topics'
+        ? allItems
+        : allItems.filter(item => item.topic === selected);
+
+      if (!filteredItems.length) filteredItems = allItems;
+      if (currentIndex >= filteredItems.length) currentIndex = 0;
+      prefs.topic = selected;
+      localStorage.setItem('ielts_trainer_prefs_v1', JSON.stringify(prefs));
+      render();
+    }
+
+    function render() {
+      const item = filteredItems[currentIndex];
+      if (!item) return;
+      collocationText.textContent = item.collocation;
+      meaningText.textContent = item.meaning;
+      introText.textContent = item.intro;
+      developText.textContent = item.develop;
+      wrapText.textContent = item.wrap;
+      topicTag.textContent = item.topic;
+      indexTag.textContent = `#${currentIndex + 1}`;
+      progressBadge.textContent = `Mục ${currentIndex + 1} / ${filteredItems.length}`;
+      const start = Math.floor(currentIndex / 10) * 10 + 1;
+      const end = Math.min(start + 9, filteredItems.length);
+      windowBadge.textContent = `Lô copy: ${start}–${end}`;
+      const key = makeKey(item);
+      answerBox.value = answers[key] || '';
+    }
+
+    answerBox.addEventListener('input', () => {
+      const item = filteredItems[currentIndex];
+      if (!item) return;
+      answers[makeKey(item)] = answerBox.value;
+      localStorage.setItem('ielts_trainer_answers_v1', JSON.stringify(answers));
+      savedBadge.textContent = 'Đã lưu tự động';
+    });
+
+    topicSelect.addEventListener('change', () => {
+      currentIndex = 0;
+      applyFilter();
+    });
+
+    startBtn.addEventListener('click', () => {
+      currentIndex = 0;
+      render();
+      showToast('Bắt đầu từ mục đầu tiên');
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        render();
+      } else {
+        showToast('Đang ở mục đầu tiên');
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentIndex < filteredItems.length - 1) {
+        currentIndex++;
+        render();
+      } else {
+        showToast('Đã tới mục cuối');
+      }
+    });
+
+    clearBtn.addEventListener('click', () => {
+      const item = filteredItems[currentIndex];
+      if (!item) return;
+      const key = makeKey(item);
+      delete answers[key];
+      localStorage.setItem('ielts_trainer_answers_v1', JSON.stringify(answers));
+      answerBox.value = '';
+      showToast('Đã xóa câu hiện tại');
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      const start = Math.floor(currentIndex / 10) * 10;
+      const chunk = filteredItems.slice(start, start + 10);
+      const lines = [];
+      lines.push('Sửa giúp tôi 10 mục IELTS Writing Task 2 dưới đây.');
+      lines.push('Yêu cầu: sửa ngữ pháp, collocation, độ tự nhiên; viết lại tốt hơn; giải thích ngắn bằng tiếng Việt.');
+      lines.push('');
+      chunk.forEach((item, i) => {
+        const key = makeKey(item);
+        lines.push(`Mục ${start + i + 1}`);
+        lines.push(`Chủ đề: ${item.topic}`);
+        lines.push(`Collocation: ${item.collocation} = ${item.meaning}`);
+        lines.push(`Mở đầu: ${item.intro}`);
+        lines.push(`Phát triển ý: ${item.develop}`);
+        lines.push(`Kết ý: ${item.wrap}`);
+        lines.push(`Bài làm của tôi: ${answers[key] || '(chưa viết)'}`);
+        lines.push('');
+      });
+      const text = lines.join('\n');
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('Đã copy 10 câu');
+      } catch {
+        const temp = document.createElement('textarea');
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        showToast('Đã copy 10 câu');
+      }
+    });
+
+    populateTopics();
+    applyFilter();
+  </script>
+</body>
+</html>
